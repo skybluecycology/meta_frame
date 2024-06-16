@@ -55,13 +55,19 @@ def aggregate_data(df, config, use_spark):
 
 # ... (previous code)
 
-def main(metadata, file_path, use_spark=False):
+# ... (previous code)
+
+def main(metadata, file_path, use_spark=False, data_source=None):
     if use_spark:
         spark = SparkSession.builder.appName("AggregationEngine").getOrCreate()
-        # Load data into a Spark DataFrame
-        df = spark.read.csv(file_path, header=True, inferSchema=True)
+        if data_source == 'databricks':
+            # Load data from Databricks using Spark SQL
+            df = spark.sql(f"SELECT * FROM {file_path}")
+        else:
+            # Load data from a CSV file into a Spark DataFrame
+            df = spark.read.csv(file_path, header=True, inferSchema=True)
     else:
-        # Load data into a pandas DataFrame
+        # Load data into a pandas DataFrame from a CSV file
         df = pd.read_csv(file_path)
     
     # Process each iteration defined in metadata
@@ -81,6 +87,10 @@ def main(metadata, file_path, use_spark=False):
             df.to_csv(output_file, index=False)
         
         print(f"Output saved to {output_file}")
+
+# Example usage:
+# main(example_metadata, 'path_to_your_csv_or_table', use_spark=True, data_source='databricks')
+
 
 # Example JSON configuration
 example_metadata = {
