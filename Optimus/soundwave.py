@@ -80,6 +80,32 @@ def aggregate_data(data_source, data_path=None, sql_query=None, meta_data):
   return result_df
 
 # Example usage:
+
+meta_data = "{
+  "group_by": ["col1", "col2"],
+  "aggregate": {
+    "col3": "sum",
+    "col4": {
+      "filter": "col4 > 10",
+      "function": "avg"
+    }
+  },
+  "rename": {
+    "col3": "total_col3",
+    "col4": "avg_col4_gt_10"
+  },
+  "filter": ["col1 != 'excluded_value'"],  // Optional filtering at top level
+  "children": [
+    {
+      "id": "child_1",
+      "link": ["col5"],  // Columns to join with parent table
+      "aggregate": {"col6": "count"},
+      "rename": {"col6": "count_col6"}
+    }
+  ]
+}
+"
+
 # Load data from CSV using pandas
 pandas_df = aggregate_data("pandas", data_path="data.csv", meta_data=meta_data)
 
